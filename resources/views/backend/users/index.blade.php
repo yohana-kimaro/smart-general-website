@@ -1,0 +1,281 @@
+@extends('layouts.backend.layout')
+
+@section('title')
+<title> Smart General Company | Administrators </title>
+@endsection
+
+@section('content')
+
+<!-- Breadcrumb -->
+<nav class="hk-breadcrumb" aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-light bg-transparent">
+    <li class="breadcrumb-item"><a href="#">{{ __('Contents') }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ __('Administrators') }}</li>
+  </ol>
+</nav>
+<!-- /Breadcrumb -->
+
+<!-- Container -->
+<div class="container">
+
+  <!-- Title -->
+  <div class="hk-pg-header">
+    <h4 class="hk-pg-title"><span class="pg-title-icon"><span class="feather-icon"><i data-feather="users"></i></span></span>{{ __('Administrators') }}</h4>
+  </div>
+  <!-- /Title -->
+
+  <!-- Row -->
+  <div class="row">
+    <div class="col-xl-12">
+      <section class="hk-sec-wrapper">
+        <h5 class="hk-sec-title">{{ __('List of administrators') }}</h5>
+        <div class="d-flex align-items-center justify-content-between mb-20">
+          <h5 class="hk-sec-title"></h5>
+          <a href="#" class="btn btn-dark" data-toggle="modal" data-target="#addNewManagementDesignations">{{ __('Add new administrator') }}</a>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <div class="table-wrap">
+              <div class="table-responsive">
+                <table id="datable_1" class="table table-hover table-bordered" width="100%">
+                  <thead>
+                    <tr>
+                      <th width="5%">{{ __('SN') }}</th>
+                      <th width="20%">{{ __('Full Name') }}</th>
+                      <th width="20%">{{ __('Phone Number') }}</th>
+                      <th width="20%">{{ __('Email') }}</th>
+                      <th width="10%">{{ __('Image') }}</th>
+                      <th width="10%">{{ __('Status') }}</th>
+                      <th width="10%">{{ __('Action') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($users as $index=> $item)
+                    <tr>
+                      <td>{{ ++$index }}</td>
+                      <td>{{ $item->firstname }} {{ $item->lastname }}</td>
+                      <td>{{ $item->phonenumber }}</td>
+                      <td>{{ $item->email }}</td>
+                      <!-- <td>{{ $item->is_admin }}</td> -->
+                      <td>
+                        <img src="{{ asset($item->image) }}" width="60px" alt="">
+                      </td>
+                      <td>
+                        @if (($currentAdmin->id !=$item->id) && ($item->id)!==1)
+                        @if ($item->status==1)
+                        <a href="" onclick="adminStatus({{ $item->id }})"><input type="checkbox" checked data-toggle="toggle" data-on="{{ __('Active') }}" data-off="{{ __('Inactive') }}" data-onstyle="success" data-offstyle="danger"></a>
+                        @else
+                        <a href="" onclick="adminStatus({{ $item->id }})"><input type="checkbox" data-toggle="toggle" data-on="{{ __('Active') }}" data-off="{{ __('Inactive') }}" data-onstyle="success" data-offstyle="danger"></a>
+
+                        @endif
+                        @endif
+                      </td>
+                      @if (($currentAdmin->id !=$item->id) && ($item->id)!==1)
+                      <td>
+                      <a href="#" data-toggle="modal" data-target="#editAdministratorInfo-{{$item->id}}" class="mr-20" data-original-title="Edit"> <i class="icon-pencil"></i> </a>
+                        <a href="#" data-toggle="modal" data-target="#deleteModal" onclick="deleteData({{ $item->id }})" data-original-title="Delete"> <i class="icon-trash txt-danger"></i> </a>
+                      </td>
+                      @endif
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- /Row -->
+
+</div>
+<!-- /Container -->
+
+<div class="modal fade" id="addNewManagementDesignations" tabindex="-1" role="dialog" aria-labelledby="exampleModalForms" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ __('Create new administrator') }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <form action="{{ route('admin.store-administrator') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="row">
+                <input type="hidden" name="is_admin" value="{{ 1 }}">
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('First name') }}</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Last name') }}</label>
+                    <input type="text" class="form-control" name="lastname" id="lastname">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-12">
+              <div class="row">
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Email') }}</label>
+                    <input type="email" class="form-control" name="email" id="email">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Phone number') }}</label>
+                    <input type="text" class="form-control" id="phonenumber" name="phonenumber">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-12">
+              <div class="row">
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Password') }} </label>
+                    <input type="password" class="form-control" id="password" name="password">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Confirm Password') }}</label>
+                    <input type="password" class="form-control" id="confirmpassword" name="confirmpassword">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-12">
+              <div class="row">
+                <div class="col-md-6 col-xl-12">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Status') }}</label>
+                    <select name="status" class="form-control">
+                      <option value="">{{__("Select..")}}</option>
+                      @foreach($onoffstatus as $stat)
+                      <option value="{{$stat->name_code}}">{{$stat->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer text-end">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close') }}</button>
+          <button type="submit" class="btn btn-success">{{ __('Create') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@foreach($users as $item)
+<!-- Update validation text-->
+<div class="modal fade" id="editAdministratorInfo-{{$item->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalForms" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ __('Update administrator') }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <form action="{{ route('admin.update-administrator', $item->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="row">
+                <input type="hidden" name="is_admin" value="{{ 1 }}">
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('First name') }}</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" value="{{$item->firstname}}">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Last name') }}</label>
+                    <input type="text" class="form-control" name="lastname" id="lastname" value="{{$item->lastname}}">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-12">
+              <div class="row">
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Email') }}</label>
+                    <input type="email" class="form-control" name="email" id="email" value="{{$item->email}}">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xl-6">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Phone number') }}</label>
+                    <input type="text" class="form-control" id="phonenumber" name="phonenumber" value="{{$item->phonenumber}}">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-12">
+              <div class="row">
+                <div class="col-md-6 col-xl-12">
+                  <div class="mb-3">
+                    <label class="form-label required">{{ __('Status') }}</label>
+                    <select name="status" class="form-control">
+                      <option value="">{{__('Select...')}}</option>
+                      @foreach($onoffstatus as $stat)
+                      <option {{ $item->status==$stat->name_code ? 'selected':'' }} value="{{$stat->name_code}}">{{$stat->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer text-end">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close') }}</button>
+          <button type="submit" class="btn btn-success">{{ __('Update') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endforeach
+
+<script>
+  function deleteData(id) {
+    $("#deleteForm").attr("action", '{{ url("/admin/delete-administrator/") }}' + "/" + id)
+  }
+
+  function projectscontentsstatus(id) {
+    $.ajax({
+      type: "get",
+      url: "{{url('/admin/administrator-status/')}}" + "/" + id,
+      success: function(response) {
+        toastr.success(response)
+      },
+      error: function(err) {
+        console.log(err);
+
+      }
+    })
+  }
+</script>
+
+@endsection
